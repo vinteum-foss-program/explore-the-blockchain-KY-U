@@ -4,5 +4,5 @@ rawtransaction=$(bitcoin-cli getrawtransaction 37d966a263350fe747f1c606b15998754
 #echo $rawtransaction
 decoded_transaction=$(bitcoin-cli decoderawtransaction $rawtransaction)
 #echo $decoded_transaction
-input_pubkeys=$(echo $decoded_transaction | jq -r '[.vin[].txinwitness[1]]') 
+input_pubkeys=$(echo $decoded_transaction | jq -r '[.vin[0:4][].txinwitness[1]]') 
 bitcoin-cli createmultisig 1 "$input_pubkeys" | jq -r '.address'
