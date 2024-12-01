@@ -1,21 +1,20 @@
 # Which tx in block 257,343 spends the coinbase output of block 256,128?
 
-#Block 256,128
+#Gets information about block 256,128
 hash=$(bitcoin-cli getblockhash 256128)
 block=$(bitcoin-cli getblock $hash)
+
+#The coinbase is the first transaction of a block
 coinbase=$(echo "$block" | jq -r '.tx[0]')
-#echo "A COINBASE QUE ESTAMOS PROCURANDO EH:"
-#echo $coinbase
 
-#Desnecessário
-#coinbase_output=$(bitcoin-cli getrawtransaction "$coinbase" true "$hash" | jq -r '.vout[].scriptPubKey.address') 
-
-#Block 257,343
+#Gets information about block 257,343
 hash=$(bitcoin-cli getblockhash 257343)
 block=$(bitcoin-cli getblock $hash 2)
+
+#Looks, for every input (vin) of every transaction in the block, every transaction iD (txid) that matches the coinbase
 echo "$block" | jq -r --arg coinbase "$coinbase" '.tx[] | select(.vin[]?.txid == $coinbase) | .txid'
 
-#coinbase=$(echo "$coinbase" | tr -d '\n')
+#For some reason, this script does not works :(
 #echo "LISTA DE TX:"
 #for tx in $(echo "$block" | jq -r '.tx[].vin[].txid?'); do
 #  tx=$(echo "$tx" | tr -d '\n')

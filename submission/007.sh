@@ -1,18 +1,19 @@
 # Only one single output remains unspent from block 123,321. What address was it sent to?
 
+#Get information about block 123321
 hash=$(bitcoin-cli getblockhash 123321)
 block=$(bitcoin-cli getblock $hash 2)
 
-#Cria os comandos a serem rodados
+#For each output of every transaction, generates a command to retrieve the unspent output information.
 echo "$block" | jq -r '.tx[] | .txid as $txid | .vout[] | "bitcoin-cli gettxout \($txid) \(.n) | jq -r \".scriptPubKey.address\""' | while read -r cmd; do
-  result=$(eval "$cmd") # Executa o comando e armazena o resultado
-  if [[ -n "$result" ]]; then # Verifica se o resultado não é nulo
+  result=$(eval "$cmd") 
+  if [[ -n "$result" ]]; then #Stops when the address is found
     echo -n $result
-    break # Encerra o loop
+    break 
   fi
 done
 
-#nem isso funciona, que tristeza
+#Does not work
 #for tx in $(echo "$block" | jq -r '.tx[].txid'); do
 #  tx=$(echo "$tx" | tr -d '\n')
 #  txout=$(bitcoin-cli gettxout "$tx" 0)
